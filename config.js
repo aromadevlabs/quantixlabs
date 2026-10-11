@@ -18,13 +18,9 @@ window.QX_CONFIG = {
     { label: "Standards", href: "#standards" },
     { label: "Process",   href: "#process" },
     { label: "Team",      href: "#team" },
-    { label: "Careers",   href: "#join" },
-    { label: "Escrow",    href: "escrow.html" }
+    { label: "Careers",   href: "#join" }
   ],
   navButton: "Join Discord",
-
-  /* ---------- Escrow login button in the nav (customer + team sign-in) ---------- */
-  escrowButton: { label: "Escrow Login", href: "escrow.html" },
 
   /* ---------- Click-to-enter screen (needed for music to play) ---------- */
   intro: {
