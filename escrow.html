@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quantix Escrow</title>
+<link rel="icon" href="assets/qx-mark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
+
+<!-- Set this to your VPS escrow backend (where the bot runs). No trailing slash. -->
+<script>window.ESCROW_API = "http://192.5.71.4:8080";</script>
+
+<style>
+:root{
+  --bg:#07080b;--surface:#0e1015;--surface-2:#14171f;--surface-3:#191d27;
+  --border:rgba(255,255,255,.08);--border-2:rgba(255,255,255,.14);
+  --text:#f3f5f9;--muted:#8a93a6;--faint:#5b6475;
+  --blue:#2f6bff;--cyan:#4cc3ff;--glow:rgba(47,107,255,.45);--ok:#36d399;--bad:#ff6b6b;
+  --discord:#5865f2;
+  --f-sans:"Plus Jakarta Sans",ui-sans-serif,system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;--r:18px;color-scheme:dark;
+}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html{background:var(--bg)}
+body{margin:0;color:var(--text);font-family:var(--f-sans);min-height:100vh;overflow-x:hidden;background:var(--bg);-webkit-font-smoothing:antialiased;line-height:1.6}
+a{color:inherit;text-decoration:none}img{max-width:100%}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:clamp(16px,4vw,32px)}
+.grad{background:linear-gradient(100deg,#7fd0ff,#3f86ff 45%,#2f6bff 70%,#9db8ff);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 8s ease-in-out infinite}
+@keyframes shine{50%{background-position:100% 0}}
+.aurora{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.aurora::before,.aurora::after{content:"";position:absolute;border-radius:50%;filter:blur(90px);opacity:.5}
+.aurora::before{width:60vw;height:60vw;left:-10vw;top:-20vw;background:radial-gradient(circle,rgba(47,107,255,.5),transparent 60%);animation:f1 18s ease-in-out infinite}
+.aurora::after{width:45vw;height:45vw;right:-8vw;top:-5vw;background:radial-gradient(circle,rgba(76,195,255,.35),transparent 60%);animation:f2 22s ease-in-out infinite}
+@keyframes f1{50%{transform:translate(6vw,8vw) scale(1.1)}}@keyframes f2{50%{transform:translate(-5vw,10vw) scale(1.15)}}
+.btn{display:inline-flex;align-items:center;gap:9px;font:600 14px/1 var(--f-sans);padding:12px 20px;border-radius:999px;background:var(--blue);color:#fff;border:0;cursor:pointer;box-shadow:0 8px 30px -8px var(--glow),inset 0 1px 0 rgba(255,255,255,.25);position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s,background .2s}
+.btn::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);transform:translateX(-120%);transition:transform .7s}
+.btn:hover{transform:translateY(-2px)}.btn:hover::after{transform:translateX(120%)}
+.btn:active{transform:translateY(0)}.btn:disabled{opacity:.6;cursor:default;transform:none}
+.btn svg{width:16px;height:16px;flex:none}
+.btn.ghost{background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px var(--border-2)}.btn.ghost:hover{background:rgba(255,255,255,.08)}
+.btn.sm{padding:9px 15px;font-size:13px}
+.btn.discord{background:var(--discord);box-shadow:0 8px 30px -8px rgba(88,101,242,.6),inset 0 1px 0 rgba(255,255,255,.25)}
+.btn.discord svg{width:20px;height:20px}
+.btn.danger{background:rgba(255,107,107,.12);color:#ffb0b0;box-shadow:inset 0 0 0 1px rgba(255,107,107,.3)}.btn.danger:hover{background:rgba(255,107,107,.2)}
+
+.nav{position:sticky;top:0;z-index:50;padding-block:14px}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 8px 8px 16px;border-radius:999px;background:rgba(14,16,21,.72);backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);border:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16px}.brand img{width:34px;filter:drop-shadow(0 0 8px var(--glow))}.brand b{color:var(--blue)}
+.me{display:flex;align-items:center;gap:10px}
+.me img{width:28px;height:28px;border-radius:50%;border:1px solid var(--border-2)}
+.me .nm{font:600 13px var(--f-sans)}
+.role{font:600 10px var(--f-mono);text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;border-radius:999px}
+.role.dev{color:var(--cyan);background:rgba(76,195,255,.12);border:1px solid rgba(76,195,255,.3)}
+.role.cust{color:var(--muted);background:var(--surface-3);border:1px solid var(--border)}
+
+.center{min-height:78vh;display:grid;place-items:center;padding:40px 0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r)}
+.login{width:min(430px,92vw);text-align:center;padding:36px 32px;animation:rise .6s cubic-bezier(.2,.7,.2,1) both}
+.login .mark{width:66px;margin:0 auto 16px;filter:drop-shadow(0 0 16px var(--glow));animation:pulse 4s ease-in-out infinite}
+@keyframes pulse{50%{filter:drop-shadow(0 0 26px var(--glow))}}
+.login h1{font-size:25px;margin:0 0 6px;letter-spacing:-.02em}.login .sub{color:var(--muted);font-size:14px;margin:0 0 24px}
+.login .btn{width:100%;justify-content:center}
+.login .fine{color:var(--faint);font-size:12.5px;margin-top:18px;line-height:1.55}
+.err{color:var(--bad);font-size:13px;min-height:18px;margin-top:12px}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin:30px 0 6px;flex-wrap:wrap}
+.head h1{font-size:28px;letter-spacing:-.025em;margin:0}
+.eyebrow{color:var(--cyan);font:600 13px var(--f-sans);display:flex;align-items:center;gap:8px}
+.eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+.tabs{display:flex;gap:6px;margin:18px 0 22px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.tab{appearance:none;background:0;border:0;cursor:pointer;color:var(--muted);font:600 14px var(--f-sans);padding:12px 16px;position:relative;transition:color .2s}
+.tab:hover{color:var(--text)}.tab.active{color:var(--text)}
+.tab.active::after{content:"";position:absolute;left:12px;right:12px;bottom:-1px;height:2px;background:linear-gradient(90deg,var(--blue),var(--cyan));border-radius:2px;animation:tabin .3s ease}
+@keyframes tabin{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.tab .pill{display:inline-block;min-width:18px;margin-left:7px;padding:1px 7px;border-radius:999px;background:var(--surface-3);color:var(--muted);font:600 11px var(--f-mono);vertical-align:middle}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.search{flex:1;min-width:200px;padding:11px 16px;background:var(--surface-2);border:1px solid var(--border-2);border-radius:999px;color:var(--text);font:500 14px var(--f-sans);transition:border-color .2s,box-shadow .2s}
+.search:focus{outline:0;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(76,195,255,.18)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px;padding-bottom:50px}
+.res{background:linear-gradient(180deg,var(--surface),#0c0e13);border:1px solid var(--border);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;position:relative;overflow:hidden;transition:transform .25s cubic-bezier(.2,.7,.2,1),border-color .25s,box-shadow .25s;animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
+.res::before{content:"";position:absolute;inset:0;background:radial-gradient(400px circle at var(--mx,50%) var(--my,0%),rgba(47,107,255,.10),transparent 45%);opacity:0;transition:opacity .3s;pointer-events:none}
+.res:hover{transform:translateY(-4px);border-color:var(--border-2);box-shadow:0 20px 50px -24px rgba(0,0,0,.8)}.res:hover::before{opacity:1}
+.res-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.res-head h3{font-size:18px;margin:0;letter-spacing:-.01em}
+.ver{font:600 12px var(--f-mono);color:var(--cyan);background:rgba(76,195,255,.1);border:1px solid rgba(76,195,255,.25);padding:3px 9px;border-radius:999px;white-space:nowrap}
+.desc{color:var(--muted);font-size:14px;margin:10px 0 2px;min-height:2px}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:9px 14px;margin:15px 0}
+.meta div{display:flex;flex-direction:column}.meta dt{color:var(--faint);font:600 11px var(--f-sans);text-transform:uppercase;letter-spacing:.05em}.meta dd{margin:0;font-size:14px}
+.res-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:15px;border-top:1px solid var(--border)}
+.res-foot code{color:var(--faint);font:500 12px var(--f-mono)}
+.badge-owned{font:600 11px var(--f-sans);color:var(--ok);display:inline-flex;align-items:center;gap:6px}
+.badge-owned::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
+
+.panel-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:26px;max-width:640px;animation:rise .5s ease both}
+.panel-card h2{margin:0 0 4px;font-size:20px;letter-spacing:-.02em}.panel-card .hint{color:var(--muted);font-size:14px;margin:0 0 20px}
+.form-row{margin-bottom:16px}.form-row label{display:block;font:600 13px var(--f-sans);margin-bottom:7px}
+.form-row input,.form-row select{width:100%;padding:12px 14px;background:var(--surface-2);border:1px solid var(--border-2);border-radius:11px;color:var(--text);font:500 14px var(--f-sans);transition:border-color .2s,box-shadow .2s}
+.form-row input:focus,.form-row select:focus{outline:0;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(76,195,255,.18)}
+.form-row .sub{color:var(--faint);font-size:12px;margin-top:6px}
+
+.table-wrap{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--surface);animation:rise .5s ease both}
+table{width:100%;border-collapse:collapse;font-size:14px}
+thead th{text-align:left;padding:14px 16px;background:var(--surface-2);color:var(--muted);font:600 12px var(--f-sans);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)}
+tbody td{padding:13px 16px;border-bottom:1px solid var(--border);vertical-align:middle}
+tbody tr{transition:background .15s}tbody tr:hover{background:rgba(255,255,255,.02)}tbody tr:last-child td{border-bottom:0}
+.who{font:500 13px var(--f-mono);color:var(--text)}
+
+.empty,.loading{color:var(--muted);text-align:center;padding:64px 0}
+.spinner{width:34px;height:34px;border:3px solid var(--border-2);border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.footer{color:var(--faint);font-size:12px;text-align:center;padding:26px 0;border-top:1px solid var(--border);margin-top:20px}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--surface-3);border:1px solid var(--border-2);color:var(--text);padding:13px 20px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:100;box-shadow:0 20px 50px -20px rgba(0,0,0,.8)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.toast.ok{border-color:rgba(54,211,153,.4)}.toast.bad{border-color:rgba(255,107,107,.4)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+
+<div class="nav"><div class="wrap"><div class="nav-inner">
+  <a class="brand" href="/"><img src="assets/qx-mark.png" alt=""><span>Quantix <b>Escrow</b></span></a>
+  <div class="me" id="me" hidden>
+    <img id="meAvatar" alt=""><span class="nm" id="meName"></span>
+    <span class="role" id="meRole"></span>
+    <button class="btn ghost sm" id="logoutBtn">Sign out</button>
+  </div>
+</div></div></div>
+
+<!-- SIGN-IN -->
+<section id="loginView" class="center">
+  <div class="card login">
+    <img class="mark" src="assets/qx-mark.png" alt="">
+    <h1>Quantix <span class="grad">Escrow</span></h1>
+    <p class="sub">Sign in with Discord to access your assets.</p>
+    <button class="btn discord" id="signinBtn">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 4.4A19.8 19.8 0 0 0 15.4 3l-.2.4a14.6 14.6 0 0 1 4.3 2.2 17.8 17.8 0 0 0-15 0A14.6 14.6 0 0 1 8.8 3.4L8.6 3A19.8 19.8 0 0 0 3.7 4.4C.6 9 .1 13.4.3 17.8a19.9 19.9 0 0 0 6 3l.5-.6a11.6 11.6 0 0 1-1.9-.9l.5-.4a14.2 14.2 0 0 0 12.2 0l.5.4a11.6 11.6 0 0 1-1.9.9l.5.6a19.9 19.9 0 0 0 6-3c.3-5.1-.5-9.5-3.3-13.4ZM8.3 15.2c-1.2 0-2.1-1.1-2.1-2.4S7.1 10.4 8.3 10.4s2.1 1.1 2.1 2.4-.9 2.4-2.1 2.4Zm7.4 0c-1.2 0-2.1-1.1-2.1-2.4s.9-2.4 2.1-2.4 2.1 1.1 2.1 2.4-.9 2.4-2.1 2.4Z"/></svg>
+      Sign in with Discord
+    </button>
+    <div class="err" id="loginErr"></div>
+    <p class="fine">You'll see the assets you've been granted. Team members with the developer role get the full management panel.</p>
+  </div>
+</section>
+
+<!-- APP -->
+<main id="appView" class="wrap" hidden>
+  <div class="head">
+    <div>
+      <div class="eyebrow" id="appEyebrow">Your library</div>
+      <h1 id="appTitle">My <span class="grad">Assets</span></h1>
+    </div>
+    <button class="btn ghost sm" id="refreshBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>Refresh
+    </button>
+  </div>
+
+  <!-- DEV tabs (hidden for customers) -->
+  <div class="tabs" id="devTabs" hidden>
+    <button class="tab active" data-tab="resources">Resources <span class="pill" id="cResources">0</span></button>
+    <button class="tab" data-tab="grant">Grant Access</button>
+    <button class="tab" data-tab="grants">Granted <span class="pill" id="cGrants">0</span></button>
+  </div>
+
+  <!-- panel: resources (dev) / my assets (customer) share the same grid area -->
+  <section data-panel="resources">
+    <div class="toolbar" id="resToolbar"><input class="search" id="search" placeholder="Search assets…"></div>
+    <div id="list" class="grid"></div>
+  </section>
+
+  <!-- grant (dev) -->
+  <section data-panel="grant" hidden>
+    <div class="panel-card">
+      <h2>Grant asset access</h2>
+      <p class="hint">Give a Discord user download access to a locked asset — e.g. after they buy it. Next time they sign in, the asset appears in their library.</p>
+      <form id="grantForm" autocomplete="off">
+        <div class="form-row"><label for="gAsset">Asset</label><select id="gAsset"></select></div>
+        <div class="form-row"><label for="gId">Discord ID</label>
+          <input id="gId" inputmode="numeric" placeholder="e.g. 441823954844090369">
+          <div class="sub">Right-click a user in Discord → Copy User ID (Developer Mode on).</div>
+        </div>
+        <div class="form-row"><label for="gNote">Note <span style="color:var(--faint);font-weight:500">(optional)</span></label>
+          <input id="gNote" maxlength="120" placeholder="Order #, buyer name…"></div>
+        <button class="btn" type="submit" id="grantBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>Grant access</button>
+        <div class="err" id="grantErr"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- granted (dev) -->
+  <section data-panel="grants" hidden>
+    <div class="toolbar"><input class="search" id="searchG" placeholder="Search by asset, Discord ID or note…"></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Asset</th><th>Discord ID</th><th>Note</th><th>Granted</th><th></th></tr></thead>
+      <tbody id="grantRows"></tbody>
+    </table></div>
+  </section>
+</main>
+
+<div class="footer">Quantix Escrow API · locked resource registry</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const API=(window.ESCROW_API||'').replace(/\/$/,'');
+const _mem={};const store={get(k){try{return localStorage.getItem(k);}catch{return _mem[k]??null;}},set(k,v){try{localStorage.setItem(k,v);}catch{_mem[k]=v;}},del(k){try{localStorage.removeItem(k);}catch{delete _mem[k];}}};
+const $=(s)=>document.querySelector(s),$$=(s)=>document.querySelectorAll(s);
+const TK='qx_session';
+let ME=null, RES=[], GRANTS=[], MINE=[];
+
+function toast(m,k){const t=$('#toast');t.className='toast show '+(k||'');t.textContent=m;setTimeout(()=>t.className='toast',2800);}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function fmtDate(ms){try{return new Date(ms).toISOString().slice(0,10);}catch{return '—';}}
+function fmtSize(b){if(!b)return '—';const u=['B','KB','MB','GB'];let i=0,n=b;while(n>=1024&&i<u.length-1){n/=1024;i++;}return n.toFixed(n<10&&i>0?1:0)+' '+u[i];}
+function showLogin(){$('#loginView').hidden=false;$('#appView').hidden=true;$('#me').hidden=true;}
+function showApp(){$('#loginView').hidden=true;$('#appView').hidden=false;$('#me').hidden=false;}
+
+async function api(path,opts={}){
+  const t=store.get(TK);const headers=Object.assign({},opts.headers||{});
+  if(t)headers['Authorization']='Bearer '+t;
+  const res=await fetch(API+path,Object.assign({},opts,{headers}));
+  if(res.status===401){store.del(TK);showLogin();throw new Error('Session expired — sign in again.');}
+  return res;
+}
+
+/* sign in */
+$('#signinBtn').addEventListener('click',()=>{
+  if(!API){$('#loginErr').textContent='Site not configured (ESCROW_API unset).';return;}
+  window.location.href=API+'/auth/login';
+});
+$('#logoutBtn').addEventListener('click',()=>{store.del(TK);ME=null;showLogin();});
+$('#refreshBtn').addEventListener('click',()=>ME&&ME.dev?loadDev():loadMine());
+
+/* capture token from the OAuth redirect fragment: #token=... or #error=auth */
+function captureToken(){
+  const h=window.location.hash||'';
+  if(h.startsWith('#token=')){store.set(TK,decodeURIComponent(h.slice(7)));history.replaceState(null,'',window.location.pathname);return true;}
+  if(h.startsWith('#error=')){history.replaceState(null,'',window.location.pathname);$('#loginErr').textContent='Sign-in failed or was cancelled. Try again.';}
+  return false;
+}
+
+/* tabs (dev) */
+$$('.tab').forEach(t=>t.addEventListener('click',()=>{
+  $$('.tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');
+  const name=t.dataset.tab;$$('[data-panel]').forEach(p=>p.hidden=(p.dataset.panel!==name));
+}));
+
+/* --- customer view --- */
+async function loadMine(){
+  $('#list').innerHTML='<div class="loading"><div class="spinner"></div>Loading your assets…</div>';
+  try{const d=await(await api('/api/my/assets')).json();MINE=d.assets||[];renderMine(MINE);}
+  catch(ex){$('#list').innerHTML='<div class="empty">'+esc(ex.message)+'</div>';}
+}
+function renderMine(rows){
+  if(!rows.length){$('#list').innerHTML='<div class="empty">No assets yet. Once you\'re granted one in Discord, it\'ll appear here.</div>';return;}
+  $('#list').innerHTML=rows.map((r,i)=>card(r,i,true)).join('');bindCards();
+  $$('[data-dl]').forEach(b=>b.addEventListener('click',()=>download('/api/my/download/',b.dataset.dl,b)));
+}
+
+/* --- dev view --- */
+async function loadDev(){await Promise.all([loadResources(),loadGrants()]);}
+async function loadResources(){
+  $('#list').innerHTML='<div class="loading"><div class="spinner"></div>Loading resources…</div>';
+  try{
+    const d=await(await api('/api/resources')).json();RES=d.resources||[];
+    $('#cResources').textContent=RES.length;renderResources(RES);
+    $('#gAsset').innerHTML=RES.map(r=>`<option value="${esc(r.lock_id)}">${esc(r.name)} v${esc(r.version)} — ${esc(r.lock_id)}</option>`).join('')||'<option value="">No assets yet</option>';
+  }catch(ex){$('#list').innerHTML='<div class="empty">'+esc(ex.message)+'</div>';}
+}
+function renderResources(rows){
+  if(!rows.length){$('#list').innerHTML='<div class="empty">No locked resources yet. Use <code>/lock</code> in Discord.</div>';return;}
+  $('#list').innerHTML=rows.map((r,i)=>card(r,i,false)).join('');bindCards();
+  $$('[data-dl]').forEach(b=>b.addEventListener('click',()=>download('/api/download/',b.dataset.dl,b)));
+}
+
+/* shared card markup */
+function card(r,i,owned){
+  const metaExtra = owned
+    ? `<div><dt>Granted</dt><dd>${fmtDate(r.granted_at)}</dd></div><div><dt>Updated</dt><dd>${fmtDate(r.updated_at)}</dd></div>`
+    : `<div><dt>Lua locked</dt><dd>${esc(r.lua_count)}</dd></div><div><dt>Readable kept</dt><dd>${esc(r.kept_count)}</dd></div>`;
+  const foot = owned
+    ? `<span class="badge-owned">Owned</span>`
+    : `<code>${esc(r.lock_id)}</code>`;
+  return `
+   <div class="res" style="animation-delay:${Math.min(i*45,360)}ms">
+     <div class="res-head"><h3>${esc(r.name)}</h3><span class="ver">v${esc(r.version)}</span></div>
+     ${r.description?`<p class="desc">${esc(r.description)}</p>`:'<p class="desc"></p>'}
+     <dl class="meta">
+       <div><dt>Author</dt><dd>${esc(r.author)}</dd></div>
+       <div><dt>Size</dt><dd>${fmtSize(r.size)}</dd></div>
+       ${metaExtra}
+     </dl>
+     <div class="res-foot">${foot}
+       <button class="btn sm" data-dl="${esc(r.lock_id)}">
+         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>Download</button>
+     </div>
+   </div>`;
+}
+function bindCards(){$$('.res').forEach(c=>c.addEventListener('pointermove',e=>{const r=c.getBoundingClientRect();c.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');c.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');}));}
+
+async function download(base,lockId,btn){
+  const old=btn.innerHTML;btn.disabled=true;btn.textContent='Preparing…';
+  try{
+    const d=await(await api(base+encodeURIComponent(lockId))).json();
+    if(d.ok&&d.url){const a=document.createElement('a');a.href=d.url;a.download=d.file_name||'';document.body.appendChild(a);a.click();a.remove();toast('Download started.','ok');}
+    else toast(d.error||'Could not get link.','bad');
+  }catch(ex){toast(ex.message,'bad');}finally{btn.disabled=false;btn.innerHTML=old;}
+}
+
+/* search (works for whichever view is active) */
+$('#search').addEventListener('input',e=>{
+  const q=e.target.value.toLowerCase().trim();
+  if(ME&&ME.dev)renderResources(!q?RES:RES.filter(r=>[r.name,r.author,r.lock_id].some(v=>(v||'').toLowerCase().includes(q))));
+  else renderMine(!q?MINE:MINE.filter(r=>[r.name,r.author].some(v=>(v||'').toLowerCase().includes(q))));
+});
+
+/* grants (dev) */
+async function loadGrants(){
+  try{const d=await(await api('/api/grants')).json();GRANTS=d.grants||[];$('#cGrants').textContent=GRANTS.length;renderGrants(GRANTS);}catch{}
+}
+function renderGrants(rows){
+  const tb=$('#grantRows');
+  if(!rows.length){tb.innerHTML='<tr><td colspan="5"><div class="empty" style="padding:40px 0">No access granted yet. Use the Grant Access tab or <code>/grant</code> in Discord.</div></td></tr>';return;}
+  tb.innerHTML=rows.map(g=>`
+    <tr>
+      <td><strong>${esc(g.resource_name)}</strong> <span style="color:var(--faint)">v${esc(g.resource_version)}</span></td>
+      <td><span class="who">${esc(g.discord_id)}</span></td>
+      <td style="color:var(--muted)">${esc(g.note)||'—'}</td>
+      <td style="color:var(--muted)">${fmtDate(g.created_at)}</td>
+      <td style="text-align:right"><button class="btn danger sm" data-revoke="${esc(g.grant_id)}">Revoke</button></td>
+    </tr>`).join('');
+  $$('[data-revoke]').forEach(b=>b.addEventListener('click',()=>revoke(b.dataset.revoke)));
+}
+async function revoke(id){try{const d=await(await api('/api/grants/'+encodeURIComponent(id)+'/revoke',{method:'POST'})).json();if(d.ok){toast('Access revoked.','ok');loadGrants();}}catch(ex){toast(ex.message,'bad');}}
+$('#searchG').addEventListener('input',e=>{const q=e.target.value.toLowerCase().trim();renderGrants(!q?GRANTS:GRANTS.filter(g=>[g.resource_name,g.discord_id,g.note].some(v=>(v||'').toLowerCase().includes(q))));});
+$('#grantForm').addEventListener('submit',async(e)=>{
+  e.preventDefault();
+  const lock_id=$('#gAsset').value,discord_id=$('#gId').value.trim(),note=$('#gNote').value.trim();
+  const btn=$('#grantBtn'),err=$('#grantErr');err.textContent='';
+  if(!lock_id){err.textContent='Lock an asset first (none to grant).';return;}
+  if(!/^\d{5,25}$/.test(discord_id)){err.textContent='Enter a valid Discord ID (numbers only).';return;}
+  btn.disabled=true;
+  try{
+    const d=await(await api('/api/grants',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lock_id,discord_id,note})})).json();
+    if(d.ok){toast('Access granted.','ok');$('#gId').value='';$('#gNote').value='';loadGrants();
+      $$('.tab').forEach(x=>x.classList.remove('active'));document.querySelector('[data-tab="grants"]').classList.add('active');
+      $$('[data-panel]').forEach(p=>p.hidden=(p.dataset.panel!=='grants'));
+    } else err.textContent=d.error||'Could not grant access.';
+  }catch(ex){err.textContent=ex.message;}finally{btn.disabled=false;}
+});
+
+/* configure the view for the signed-in user's role */
+function applyRole(){
+  $('#meAvatar').src=ME.avatar||'';$('#meName').textContent=ME.name||'';
+  const rb=$('#meRole');
+  if(ME.dev){rb.textContent='Developer';rb.className='role dev';
+    $('#devTabs').hidden=false;$('#appEyebrow').textContent='Escrow registry';
+    $('#appTitle').innerHTML='Locked <span class="grad">Assets</span>';$('#resToolbar').hidden=false;
+  }else{rb.textContent='Member';rb.className='role cust';
+    $('#devTabs').hidden=true;$('#appEyebrow').textContent='Your library';
+    $('#appTitle').innerHTML='My <span class="grad">Assets</span>';$('#resToolbar').hidden=false;
+  }
+}
+
+/* boot */
+(async function(){
+  captureToken();
+  if(store.get(TK)){
+    try{
+      const d=await(await api('/api/me')).json();
+      if(d.ok){ME=d.user;applyRole();showApp();ME.dev?await loadDev():await loadMine();return;}
+    }catch{}
+  }
+  showLogin();
+})();
+</script>
+</body>
+</html>

@@ -273,6 +273,7 @@ body.locked{overflow:hidden}
     <div class="nav-inner">
       <a class="brand" href="#top"><img data-logo alt=""><span data-brand-text></span></a>
       <div class="links" id="navLinks"></div>
+      <a class="btn sm ghost" id="escrowBtn" hidden></a>
       <a class="btn sm" data-discord id="navBtn"></a>
     </div>
   </div>
@@ -433,6 +434,10 @@ body.locked{overflow:hidden}
   document.querySelectorAll('[data-icon]').forEach(el=>{ el.outerHTML = icon(el.dataset.icon); });
   $('navLinks').innerHTML = (C.nav||[]).map(l=>`<a href="${esc(l.href)}">${esc(l.label)}</a>`).join('');
   txt('navBtn', C.navButton);
+  if (C.escrowButton) {
+    const eb = $('escrowBtn');
+    if (eb) { eb.textContent = C.escrowButton.label; eb.href = C.escrowButton.href; eb.hidden = false; }
+  }
   txt('footTag', S.tagline); txt('footCopy', S.copyright);
   txt('introTagline', (S.tagline||'').replace(/\.$/,''));
   txt('invite', S.discordLabel);

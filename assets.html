@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quantix · My Assets</title>
+<link rel="icon" href="assets/qx-mark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<script>window.ESCROW_API = "http://192.5.71.4:8080";</script>
+<style>
+:root{
+  --bg:#07080b;--surface:#0e1015;--surface-2:#14171f;--surface-3:#191d27;
+  --border:rgba(255,255,255,.08);--border-2:rgba(255,255,255,.14);
+  --text:#f3f5f9;--muted:#8a93a6;--faint:#5b6475;
+  --blue:#2f6bff;--cyan:#4cc3ff;--glow:rgba(47,107,255,.45);--ok:#36d399;--bad:#ff6b6b;
+  --f-sans:"Plus Jakarta Sans",ui-sans-serif,system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;--r:18px;color-scheme:dark;
+}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html{background:var(--bg)}
+body{margin:0;color:var(--text);font-family:var(--f-sans);min-height:100vh;overflow-x:hidden;background:var(--bg);-webkit-font-smoothing:antialiased;line-height:1.6}
+a{color:inherit;text-decoration:none}img{max-width:100%}
+.wrap{max-width:1100px;margin:0 auto;padding-inline:clamp(16px,4vw,32px)}
+.grad{background:linear-gradient(100deg,#7fd0ff,#3f86ff 45%,#2f6bff 70%,#9db8ff);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 8s ease-in-out infinite}
+@keyframes shine{50%{background-position:100% 0}}
+.aurora{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.aurora::before,.aurora::after{content:"";position:absolute;border-radius:50%;filter:blur(90px);opacity:.45}
+.aurora::before{width:60vw;height:60vw;left:-10vw;top:-20vw;background:radial-gradient(circle,rgba(47,107,255,.5),transparent 60%);animation:f1 18s ease-in-out infinite}
+.aurora::after{width:45vw;height:45vw;right:-8vw;top:-5vw;background:radial-gradient(circle,rgba(76,195,255,.35),transparent 60%);animation:f2 22s ease-in-out infinite}
+@keyframes f1{50%{transform:translate(6vw,8vw) scale(1.1)}}@keyframes f2{50%{transform:translate(-5vw,10vw) scale(1.15)}}
+.btn{display:inline-flex;align-items:center;gap:9px;font:600 14px/1 var(--f-sans);padding:12px 20px;border-radius:999px;background:var(--blue);color:#fff;border:0;cursor:pointer;box-shadow:0 8px 30px -8px var(--glow),inset 0 1px 0 rgba(255,255,255,.25);position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.btn::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);transform:translateX(-120%);transition:transform .7s}
+.btn:hover{transform:translateY(-2px)}.btn:hover::after{transform:translateX(120%)}
+.btn:disabled{opacity:.6;cursor:default;transform:none}.btn svg{width:16px;height:16px}
+.btn.ghost{background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px var(--border-2)}.btn.ghost:hover{background:rgba(255,255,255,.08)}
+.btn.sm{padding:9px 15px;font-size:13px}
+.nav{position:sticky;top:0;z-index:50;padding-block:14px}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 8px 8px 16px;border-radius:999px;background:rgba(14,16,21,.72);backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);border:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16px}.brand img{width:34px;filter:drop-shadow(0 0 8px var(--glow))}.brand b{color:var(--blue)}
+.center{min-height:76vh;display:grid;place-items:center;padding:40px 0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r)}
+.login{width:min(440px,92vw);text-align:center;padding:34px 30px;animation:rise .6s cubic-bezier(.2,.7,.2,1) both}
+.login .mark{width:66px;margin:0 auto 16px;filter:drop-shadow(0 0 16px var(--glow));animation:pulse 4s ease-in-out infinite}
+@keyframes pulse{50%{filter:drop-shadow(0 0 26px var(--glow))}}
+.login h1{font-size:25px;margin:0 0 4px;letter-spacing:-.02em}.login .sub{color:var(--muted);font-size:14px;margin:0 0 22px}
+.field{margin:12px 0}
+.field input{width:100%;padding:14px 16px;background:var(--surface-2);border:1px solid var(--border-2);border-radius:12px;color:var(--text);font:500 15px var(--f-mono);letter-spacing:.5px;transition:border-color .2s,box-shadow .2s}
+.field input:focus{outline:0;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(76,195,255,.18)}
+.login .btn{width:100%;justify-content:center;margin-top:4px}
+.err{color:var(--bad);font-size:13px;min-height:18px;margin-top:10px}
+.helper{color:var(--faint);font-size:12.5px;margin-top:16px;line-height:1.55}
+.helper code{color:var(--cyan);font-family:var(--f-mono)}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.head{margin:30px 0 20px}
+.head .eyebrow{color:var(--cyan);font:600 13px var(--f-sans);display:flex;align-items:center;gap:8px}
+.head .eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+.head h1{font-size:28px;letter-spacing:-.025em;margin:4px 0 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px;padding-bottom:50px}
+.res{background:linear-gradient(180deg,var(--surface),#0c0e13);border:1px solid var(--border);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;position:relative;overflow:hidden;transition:transform .25s cubic-bezier(.2,.7,.2,1),border-color .25s,box-shadow .25s;animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
+.res::before{content:"";position:absolute;inset:0;background:radial-gradient(400px circle at var(--mx,50%) var(--my,0%),rgba(47,107,255,.10),transparent 45%);opacity:0;transition:opacity .3s;pointer-events:none}
+.res:hover{transform:translateY(-4px);border-color:var(--border-2);box-shadow:0 20px 50px -24px rgba(0,0,0,.8)}.res:hover::before{opacity:1}
+.res-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.res-head h3{font-size:18px;margin:0;letter-spacing:-.01em}
+.ver{font:600 12px var(--f-mono);color:var(--cyan);background:rgba(76,195,255,.1);border:1px solid rgba(76,195,255,.25);padding:3px 9px;border-radius:999px;white-space:nowrap}
+.desc{color:var(--muted);font-size:14px;margin:10px 0 2px;min-height:2px}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:9px 14px;margin:15px 0}
+.meta div{display:flex;flex-direction:column}.meta dt{color:var(--faint);font:600 11px var(--f-sans);text-transform:uppercase;letter-spacing:.05em}.meta dd{margin:0;font-size:14px}
+.res-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:15px;border-top:1px solid var(--border)}
+.badge-owned{font:600 11px var(--f-sans);color:var(--ok);display:inline-flex;align-items:center;gap:6px}
+.badge-owned::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.empty,.loading{color:var(--muted);text-align:center;padding:64px 0}
+.spinner{width:34px;height:34px;border:3px solid var(--border-2);border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.footer{color:var(--faint);font-size:12px;text-align:center;padding:26px 0;border-top:1px solid var(--border);margin-top:20px}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--surface-3);border:1px solid var(--border-2);color:var(--text);padding:13px 20px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:100;box-shadow:0 20px 50px -20px rgba(0,0,0,.8)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.toast.ok{border-color:rgba(54,211,153,.4)}.toast.bad{border-color:rgba(255,107,107,.4)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+
+<div class="nav"><div class="wrap"><div class="nav-inner">
+  <a class="brand" href="/"><img src="assets/qx-mark.png" alt=""><span>Quantix <b>Labs</b></span></a>
+  <button class="btn ghost sm" id="logoutBtn" hidden>Sign out</button>
+</div></div></div>
+
+<!-- LOGIN -->
+<section id="loginView" class="center">
+  <div class="card login">
+    <img class="mark" src="assets/qx-mark.png" alt="">
+    <h1>My <span class="grad">Assets</span></h1>
+    <p class="sub">Enter your access key to download what you own.</p>
+    <form id="loginForm" autocomplete="off">
+      <div class="field"><input id="key" placeholder="Access key" autofocus></div>
+      <button class="btn" type="submit" id="loginBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3M18 5l2 2M16 7l2 2"/></svg>
+        Unlock
+      </button>
+      <div class="err" id="loginErr"></div>
+    </form>
+    <p class="helper">Don't have a key? Run <code>/mykey</code> in the Quantix Labs Discord to get yours. You'll also get it by DM when you're granted an asset.</p>
+  </div>
+</section>
+
+<!-- ASSETS -->
+<main id="assetsView" class="wrap" hidden>
+  <div class="head">
+    <div class="eyebrow">Your library</div>
+    <h1>My <span class="grad">Assets</span></h1>
+  </div>
+  <div id="list" class="grid"></div>
+</main>
+
+<div class="footer">Quantix Labs · your purchased assets</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const API=(window.ESCROW_API||'').replace(/\/$/,'');
+const _mem={};const store={get(k){try{return localStorage.getItem(k);}catch{return _mem[k]??null;}},set(k,v){try{localStorage.setItem(k,v);}catch{_mem[k]=v;}},del(k){try{localStorage.removeItem(k);}catch{delete _mem[k];}}};
+
+const $=(s)=>document.querySelector(s),$$=(s)=>document.querySelectorAll(s);
+const TK='qx_customer_token';
+let MINE=[];
+function toast(m,k){const t=$('#toast');t.className='toast show '+(k||'');t.textContent=m;setTimeout(()=>t.className='toast',2800);}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function fmtDate(ms){try{return new Date(ms).toISOString().slice(0,10);}catch{return '—';}}
+function fmtSize(b){if(!b)return '—';const u=['B','KB','MB','GB'];let i=0,n=b;while(n>=1024&&i<u.length-1){n/=1024;i++;}return n.toFixed(n<10&&i>0?1:0)+' '+u[i];}
+function showLogin(){$('#loginView').hidden=false;$('#assetsView').hidden=true;$('#logoutBtn').hidden=true;}
+function showAssets(){$('#loginView').hidden=true;$('#assetsView').hidden=false;$('#logoutBtn').hidden=false;}
+
+async function api(path,opts={}){
+  const t=store.get(TK);const headers=Object.assign({},opts.headers||{});
+  if(t)headers['Authorization']='Bearer '+t;
+  const res=await fetch(API+path,Object.assign({},opts,{headers}));
+  if(res.status===401){store.del(TK);showLogin();throw new Error('Session expired — enter your key again.');}
+  return res;
+}
+
+$('#loginForm').addEventListener('submit',async(e)=>{
+  e.preventDefault();
+  const key=$('#key').value.trim(),btn=$('#loginBtn'),err=$('#loginErr');err.textContent='';btn.disabled=true;
+  try{
+    if(!API)throw new Error('Site not configured (ESCROW_API unset).');
+    const res=await fetch(API+'/api/customer/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({access_key:key})});
+    const d=await res.json().catch(()=>({}));
+    if(res.ok&&d.ok){store.set(TK,d.token);$('#key').value='';await loadAssets();showAssets();}
+    else err.textContent=d.error||'Invalid access key.';
+  }catch(ex){err.textContent=ex.message.includes('Failed to fetch')?'Cannot reach the server. Try again shortly.':ex.message;}
+  finally{btn.disabled=false;}
+});
+$('#logoutBtn').addEventListener('click',()=>{store.del(TK);showLogin();});
+
+async function loadAssets(){
+  $('#list').innerHTML='<div class="loading"><div class="spinner"></div>Loading your assets…</div>';
+  try{
+    const d=await(await api('/api/customer/assets')).json();
+    MINE=d.assets||[];render(MINE);
+  }catch(ex){$('#list').innerHTML='<div class="empty">'+esc(ex.message)+'</div>';}
+}
+
+function render(rows){
+  if(!rows.length){$('#list').innerHTML='<div class="empty">No assets yet. Once you\'re granted one in Discord, it\'ll appear here.</div>';return;}
+  $('#list').innerHTML=rows.map((r,i)=>`
+   <div class="res" style="animation-delay:${Math.min(i*50,400)}ms">
+     <div class="res-head"><h3>${esc(r.name)}</h3><span class="ver">v${esc(r.version)}</span></div>
+     ${r.description?`<p class="desc">${esc(r.description)}</p>`:'<p class="desc"></p>'}
+     <dl class="meta">
+       <div><dt>Author</dt><dd>${esc(r.author)}</dd></div>
+       <div><dt>Size</dt><dd>${fmtSize(r.size)}</dd></div>
+       <div><dt>Granted</dt><dd>${fmtDate(r.granted_at)}</dd></div>
+       <div><dt>Updated</dt><dd>${fmtDate(r.updated_at)}</dd></div>
+     </dl>
+     <div class="res-foot"><span class="badge-owned">Owned</span>
+       <button class="btn sm" data-dl="${esc(r.lock_id)}">
+         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>Download</button>
+     </div>
+   </div>`).join('');
+  $$('.res').forEach(card=>card.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect();card.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');card.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');}));
+  $$('[data-dl]').forEach(b=>b.addEventListener('click',()=>download(b.dataset.dl,b)));
+}
+
+async function download(lockId,btn){
+  const old=btn.innerHTML;btn.disabled=true;btn.textContent='Preparing…';
+  try{
+    const d=await(await api('/api/customer/download/'+encodeURIComponent(lockId))).json();
+    if(d.ok&&d.url){const a=document.createElement('a');a.href=d.url;a.download=d.file_name||'';document.body.appendChild(a);a.click();a.remove();toast('Download started.','ok');}
+    else toast(d.error||'Could not get link.','bad');
+  }catch(ex){toast(ex.message,'bad');}
+  finally{btn.disabled=false;btn.innerHTML=old;}
+}
+
+(async function(){if(store.get(TK)){try{await loadAssets();showAssets();return;}catch{}}showLogin();})();
+</script>
+</body>
+</html>

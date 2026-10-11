@@ -1,0 +1,61 @@
+QUANTIX ESCROW — ONE PAGE, DISCORD SIGN-IN
+===========================================
+
+escrow.html is the single page for everyone. People "Sign in with Discord";
+the backend checks their role in your server and shows the right view:
+
+  • Has the DEVELOPER role  -> full team panel (Resources, Grant Access, Granted)
+  • Anyone else             -> "My Assets": only the assets granted to them
+
+Access is tied to real Discord IDs. No passwords, no access keys.
+
+=====================================================================
+SET-UP (do these once)
+=====================================================================
+
+1) DISCORD DEVELOPER PORTAL  (same app as your bot)
+   - OAuth2 -> Client Secret -> "Reset Secret", copy it.
+   - OAuth2 -> Redirects -> add EXACTLY:
+         http://192.5.71.4:8080/auth/callback
+     (use your VPS IP/domain + :8080; must match the .env value below exactly)
+
+2) BOT .env  (on the VPS)
+   DISCORD_CLIENT_SECRET=<the secret you just copied>
+   DISCORD_REDIRECT_URI=http://192.5.71.4:8080/auth/callback
+   WEB_SITE_URL=https://quantixlabs.onrender.com/escrow.html
+   WEB_ALLOWED_ORIGINS=https://quantixlabs.onrender.com
+   (DISCORD_CLIENT_ID / DISCORD_TOKEN / DEV_ROLE_ID are already set.)
+
+   Then restart the bot:  (Ctrl+C) npm start
+   And re-register commands once:  npm run deploy   (adds /grant, /myassets)
+
+3) WEBSITE  (escrow.html)
+   - Edit the one line at the top:
+         window.ESCROW_API = "http://192.5.71.4:8080";
+   - Deploy to Render. Live at: https://quantixlabs.onrender.com/escrow.html
+   - Link it from your nav. (panel.html / assets.html are gone — one page now.)
+
+=====================================================================
+HOW GRANTING WORKS
+=====================================================================
+- A dev grants access two ways:
+    * escrow.html -> Grant Access tab (pick asset + Discord ID), or
+    * In Discord:  /grant id:<lockId> user:@buyer note:"order #"
+- The buyer just signs in with Discord on escrow.html; the asset is now in
+  their "My Assets". The bot also DMs them the sign-in link.
+- Buyers can run /myassets in Discord to see what they own + the link.
+- Revoke anytime from the Granted tab.
+
+=====================================================================
+IMPORTANT: HTTPS / MIXED CONTENT
+=====================================================================
+Your site is https (Render) but the VPS is http. Browsers BLOCK https->http
+requests ("mixed content"), so sign-in/downloads will fail from the live site
+until the VPS is reachable over https. Fix one:
+   a) Point a subdomain with an HTTPS cert at the VPS (e.g. escrow.quantixlabs.com)
+      and use that for BOTH ESCROW_API and DISCORD_REDIRECT_URI, or
+   b) Put the bot's web server behind an https reverse proxy.
+Ask and I'll set it up. (You can test over http in the meantime.)
+
+Sessions last 8 hours in the browser so people aren't re-signing-in constantly.
+Downloads use short-lived signed links from the VPS; files never touch the site.

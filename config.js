@@ -12,15 +12,19 @@ window.QX_CONFIG = {
     copyright: "© 2026 Quantix Labs"
   },
 
-  /* ---------- Top menu (href "#id" jumps to a section) ---------- */
+  /* ---------- Top menu (href "#id" jumps to a section; full URLs work too) ---------- */
   nav: [
     { label: "Services",  href: "#services" },
     { label: "Standards", href: "#standards" },
     { label: "Process",   href: "#process" },
     { label: "Team",      href: "#team" },
-    { label: "Careers",   href: "#join" }
+    { label: "Careers",   href: "#join" },
+    { label: "Escrow",    href: "escrow.html" }
   ],
   navButton: "Join Discord",
+
+  /* ---------- Escrow login button in the nav (customer + team sign-in) ---------- */
+  escrowButton: { label: "Escrow Login", href: "escrow.html" },
 
   /* ---------- Click-to-enter screen (needed for music to play) ---------- */
   intro: {
